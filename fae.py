@@ -9,16 +9,47 @@ def get_metadata(file_path):
     result = subprocess.run(['exiftool', file_path], capture_output=True, text=True)
     return result.stdout
 
+# Magic number 정의 테이블
+MAGIC_NUMBERS = {
+    "png": bytes.fromhex("89504E470D0A1A0A"),
+    "jpg": [
+        bytes.fromhex("FFD8FFE0"),
+        bytes.fromhex("FFD8FFDB"),
+        bytes.fromhex("FFD8FFE1")
+    ],
+    "pdf": bytes.fromhex("25504446"),  # %PDF
+    "gif": [
+        bytes.fromhex("474946383761"),  # GIF87a
+        bytes.fromhex("474946383961")   # GIF89a
+    ]
+}
+
+def identify_magic(file_path):
+    with open(file_path, 'rb') as f:
+        file_head = f.read(16)  # 넉넉히 읽기
+
+    for ftype, magic in MAGIC_NUMBERS.items():
+        if isinstance(magic, list):
+            for sig in magic:
+                if file_head.startswith(sig):
+                    return ftype, len(sig)
+        else:
+            if file_head.startswith(magic):
+                return ftype, len(magic)
+    return "unknown", 0
+
 def get_hex_header(file_path, byte_count=64):
     """
-    파일 앞부분을 hexdump 형태로 출력하고, magic number 구간(첫 4바이트)의 위치 정보를 반환
+    파일 앞부분을 hexdump 형태로 출력하고, 해당 포맷의 magic number 길이에 따라 색상 강조 위치 반환
     """
     try:
         with open(file_path, 'rb') as f:
             content = f.read(byte_count)
 
+        file_type, magic_len = identify_magic(file_path)
+
         lines = []
-        highlight_positions = []  # (line_idx, start_char_idx, end_char_idx)
+        highlight_positions = []  # (line_idx, start_col, end_col)
 
         for i in range(0, len(content), 16):
             chunk = content[i:i+16]
@@ -33,9 +64,9 @@ def get_hex_header(file_path, byte_count=64):
             ascii_str = ''.join(ascii_repr)
             line = f"{i:08x}: {hex_str:<47}  {ascii_str}"
 
-            # 기록: 첫 4바이트 위치 기록
-            for j in range(min(4 - i, 16) if i < 4 else 0):
-                start = 10 + j * 3  # 10 = 앞쪽 주소+공백, 3 = 한 바이트(hex)+공백
+            # 강조 위치 계산
+            for j in range(min(magic_len - i, 16) if i < magic_len else 0):
+                start = 10 + j * 3
                 end = start + 2
                 highlight_positions.append((len(lines), start, end))
 
@@ -77,7 +108,6 @@ def select_file():
 
     result_window.delete("1.0", tk.END)
 
-    # 삽입 + 하이라이트 적용
     for idx, line in enumerate(hexdata.split('\n')):
         result_window.insert(tk.END, line + "\n")
 
