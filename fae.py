@@ -1,4 +1,3 @@
-# 파일명: main.py
 import tkinter as tk
 from tkinter import filedialog
 import subprocess
@@ -12,23 +11,40 @@ def get_metadata(file_path):
 
 def get_hex_header(file_path, byte_count=64):
     """
-    xxd 없이 바이너리 파일의 앞부분을 16진수로 출력하는 함수
+    파일 앞부분을 hexdump 형태로 출력하고, magic number 구간(첫 4바이트)의 위치 정보를 반환
     """
     try:
         with open(file_path, 'rb') as f:
             content = f.read(byte_count)
 
         lines = []
+        highlight_positions = []  # (line_idx, start_char_idx, end_char_idx)
+
         for i in range(0, len(content), 16):
             chunk = content[i:i+16]
-            hex_bytes = ' '.join(f"{b:02x}" for b in chunk)
-            ascii_repr = ''.join([chr(b) if 32 <= b <= 126 else '.' for b in chunk])
-            lines.append(f"{i:08x}: {hex_bytes:<47}  {ascii_repr}")
+            hex_bytes = []
+            ascii_repr = []
+            for j, b in enumerate(chunk):
+                byte_offset = i + j
+                hex_bytes.append(f"{b:02x}")
+                ascii_repr.append(chr(b) if 32 <= b <= 126 else '.')
 
-        return '\n'.join(lines)
+            hex_str = ' '.join(hex_bytes)
+            ascii_str = ''.join(ascii_repr)
+            line = f"{i:08x}: {hex_str:<47}  {ascii_str}"
+
+            # 기록: 첫 4바이트 위치 기록
+            for j in range(min(4 - i, 16) if i < 4 else 0):
+                start = 10 + j * 3  # 10 = 앞쪽 주소+공백, 3 = 한 바이트(hex)+공백
+                end = start + 2
+                highlight_positions.append((len(lines), start, end))
+
+            lines.append(line)
+
+        return '\n'.join(lines), highlight_positions
 
     except Exception as e:
-        return f"⚠️ 오류 발생: {e}"
+        return f"⚠️ 오류 발생: {e}", []
 
 def detect_suspicious_tags(metadata_text):
     warnings = []
@@ -56,17 +72,25 @@ def select_file():
         return
 
     meta = get_metadata(file_path)
-    hexdata = get_hex_header(file_path)
+    hexdata, highlights = get_hex_header(file_path)
     warnings = detect_suspicious_tags(meta)
 
     result_window.delete("1.0", tk.END)
-    result_window.insert(tk.END, f"[Hex Header]\n{hexdata}\n")
+
+    # 삽입 + 하이라이트 적용
+    for idx, line in enumerate(hexdata.split('\n')):
+        result_window.insert(tk.END, line + "\n")
+
+    for line_idx, start_col, end_col in highlights:
+        start = f"{line_idx + 1}.{start_col}"
+        end = f"{line_idx + 1}.{end_col}"
+        result_window.tag_add("highlight", start, end)
+
     result_window.insert(tk.END, f"\n[Metadata]\n{meta}\n")
     result_window.insert(tk.END, "\n[경고 탐지 결과]\n")
     for w in warnings:
         result_window.insert(tk.END, w + "\n")
 
-    # VirusTotal 버튼 기능 재정의
     vt_button.config(command=lambda: open_virustotal(file_path))
 
 # 메인 윈도우 생성
@@ -78,6 +102,7 @@ select_button = tk.Button(root, text="파일 선택", command=select_file)
 select_button.pack(pady=10)
 
 result_window = tk.Text(root, height=30, font=("Consolas", 10))
+result_window.tag_configure("highlight", background="yellow", foreground="black")
 result_window.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
 vt_button = tk.Button(root, text="VirusTotal로 검색")
