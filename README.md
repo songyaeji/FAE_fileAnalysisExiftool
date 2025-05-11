@@ -1,48 +1,61 @@
- 📁 ExifTool 기반 파일 조작 탐지 도구
+# 🕵️‍♀️ 파일 조작 탐지기 (ExifTool 기반 GUI)
 
-이 도구는 ExifTool을 활용하여 파일의 메타데이터와 헤더를 시각적으로 분석하고, 수상한 조작 흔적을 표시해주는 입문자용 보안 분석 GUI 툴입니다.
+**파일 조작 탐지기**는 다양한 파일 포맷의 **헤더 및 메타데이터 구조를 분석**하여 조작 여부를 식별하고, **포맷 위조 가능성**까지 감지할 수 있는 시각화 기반 GUI 툴입니다.  
+초보 정보보안 학습자도 **클릭 몇 번만으로** 포맷 조작 여부를 쉽게 파악할 수 있습니다.
 
-(xxd를 사용하지 않고 Python만으로 헤더 hex 파싱을 구현했습니다)
+---
 
-## 🔧 기능 요약
-- 파일 메타데이터 추출 (ExifTool 사용)
-- 파일 헤더(hex) 시각 출력 (Python 기반 parser 사용)
-- 조작 의심 요소 탐지 (예: 수정 시간 불일치, 수상한 툴명, GPS 정보 포함 여부)
-- VirusTotal 해시 기반 연동 (클릭 한 번으로 확인 가능)
+## ✅ 주요 기능
 
-## ✅ 사용법
+| 기능 항목                 | 설명                                                                 |
+|--------------------------|----------------------------------------------------------------------|
+| 🔍 **Hex 헤더 분석**       | 파일 앞부분 64바이트를 추출하여 **16진수 + ASCII** 형태로 출력       |
+| 🎯 **Magic Number 포맷 식별** | 파일의 실제 포맷(PNG, JPG, EXE 등)을 **시그니처 기반으로 자동 감지** |
+| ⚠️ **확장자 vs 포맷 불일치 감지** | 확장자와 magic number 기반 포맷이 다르면 **경고 출력**                |
+| 📂 **메타데이터 분석 (ExifTool)** | 생성/수정 시간, MIME Type 등 파일 내부 메타정보 표시               |
+| 📌 **포맷 위조 의심 요약**     | 포맷 구조와 메타데이터의 불일치 여부를 **요약 정리**                  |
+| 🔗 **VirusTotal 연동**       | 버튼 클릭만으로 해당 파일의 **해시 기반 악성 여부 확인 가능**        |
 
-### 1. 의존성 도구 설치
-- `ExifTool`만 있으면 됩니다. (`xxd`는 필요 없음)
+---
 
-#### Ubuntu/macOS:
+## 🧪 지원 포맷
+
+- 📷 이미지: `jpg`, `png`, `gif`  
+- 📄 문서: `pdf`, `hwp`, `doc`, `docx`, `txt`  
+- 📊 스프레드시트: `xls`, `xlsx`  
+- 📽️ 프레젠테이션: `ppt`, `pptx`  
+- ⚙️ 실행파일: `exe`  
+- 기타: ZIP 구조 기반 포맷 자동 감지 (`docx`, `pptx` 등)
+
+---
+
+## 💻 실행 방법
+
+### 1. 시스템 요구사항
+- Python 3.8 이상
+- [ExifTool](https://exiftool.org/) 설치 필요
+
+> **Windows 설치 방법**
+> - `exiftool(-k).exe` 파일을 `exiftool.exe`로 이름 변경 후, 시스템 PATH에 등록하세요.
+
+### 2. 설치 및 실행
 ```bash
-sudo apt install exiftool
-```
-
-#### Windows:
-- https://exiftool.org/ 에서 Windows용 실행 파일 다운로드 후 PATH 설정
-
-### 2. 실행
-```bash
+git clone https://github.com/yourusername/exiftool-analyzer.git
+cd exiftool-analyzer
+pip install -r requirements.txt
 python main.py
-```
 
-파일을 선택하면 결과가 GUI로 표시됩니다.
+---
 
-## 🔗 VirusTotal 연동
-- 분석 파일의 SHA256 해시를 계산하여
-- VirusTotal 웹사이트에서 검색 결과 확인 가능
+## 📂 프로젝트 구조
+FAE_fileAnalysisExiftool/
+├── main.py              # 메인 GUI 코드
+├── README.md            # 문서 파일
+├── requirements.txt     # 설치 패키지 목록
+└── test_samples/        # 위조 테스트 파일 모음 (선택사항)
 
-## 📁 파일 구성 예시
-```
-exiftool-analyzer/
-├── main.py
-├── requirements.txt
-└── README.md
-```
+---
 
-## ✨ 향후 개선 아이디어
-- 다양한 파일 포맷 지원 (PDF, ZIP 등)
-- 메타데이터 자동 비교 알고리즘
-- 색상 기반 hex 시각화 추가 (matplotlib 활용)
+## 📷 예시 스크린샷
+![⚠️ 포맷 위조 감지](image.png)
+![✅ 정상 파일](image-1.png)
