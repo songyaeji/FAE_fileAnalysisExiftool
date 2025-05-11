@@ -11,17 +11,33 @@ def get_metadata(file_path):
     return result.stdout
 
 def get_hex_header(file_path, byte_count=64):
-    result = subprocess.run(['xxd', '-l', str(byte_count), file_path], capture_output=True, text=True)
-    return result.stdout
+    """
+    xxd 없이 바이너리 파일의 앞부분을 16진수로 출력하는 함수
+    """
+    try:
+        with open(file_path, 'rb') as f:
+            content = f.read(byte_count)
+
+        lines = []
+        for i in range(0, len(content), 16):
+            chunk = content[i:i+16]
+            hex_bytes = ' '.join(f"{b:02x}" for b in chunk)
+            ascii_repr = ''.join([chr(b) if 32 <= b <= 126 else '.' for b in chunk])
+            lines.append(f"{i:08x}: {hex_bytes:<47}  {ascii_repr}")
+
+        return '\n'.join(lines)
+
+    except Exception as e:
+        return f"⚠️ 오류 발생: {e}"
 
 def detect_suspicious_tags(metadata_text):
     warnings = []
     if "HexEdit" in metadata_text or "HackerTool" in metadata_text:
-        warnings.append("\u26a0\ufe0f 수상한 툴로 생성됨")
+        warnings.append("⚠️ 수상한 툴로 생성됨")
     if "GPS" in metadata_text:
-        warnings.append("\u26a0\ufe0f GPS 정보 포함됨")
+        warnings.append("⚠️ GPS 정보 포함됨")
     if "Modify Date" in metadata_text and "Create Date" in metadata_text:
-        warnings.append("\u26a0\ufe0f 수정 시간과 생성 시간 차이 발생 가능성 있음")
+        warnings.append("⚠️ 수정 시간과 생성 시간 차이 발생 가능성 있음")
     return warnings
 
 def get_sha256(file_path):
@@ -46,7 +62,7 @@ def select_file():
     result_window.delete("1.0", tk.END)
     result_window.insert(tk.END, f"[Hex Header]\n{hexdata}\n")
     result_window.insert(tk.END, f"\n[Metadata]\n{meta}\n")
-    result_window.insert(tk.END, "\n[\uacbd\uace0 \ud0d0\uc9c0 \uacb0\uacfc]\n")
+    result_window.insert(tk.END, "\n[경고 탐지 결과]\n")
     for w in warnings:
         result_window.insert(tk.END, w + "\n")
 
@@ -58,13 +74,13 @@ root = tk.Tk()
 root.title("파일 조작 탐지기 - ExifTool 기반")
 root.geometry("800x600")
 
-select_button = tk.Button(root, text="\ud30c\uc77c \uc120\ud0dd", command=select_file)
+select_button = tk.Button(root, text="파일 선택", command=select_file)
 select_button.pack(pady=10)
 
 result_window = tk.Text(root, height=30, font=("Consolas", 10))
 result_window.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-vt_button = tk.Button(root, text="VirusTotal\ub85c \uac80\uc0c9")
+vt_button = tk.Button(root, text="VirusTotal로 검색")
 vt_button.pack(pady=5)
 
 root.mainloop()
