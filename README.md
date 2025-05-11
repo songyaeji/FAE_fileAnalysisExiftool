@@ -55,5 +55,8 @@ FAE_fileAnalysisExiftool/
 
 
 ## 📷 예시 스크린샷
-![⚠️ 포맷 위조 감지](screenshots/danger.png)
-![✅ 정상 파일](screenshots/ok.png)
+#### ⚠️ 포맷 위조 감지
+<img src="screenshots/danger.png" width="600"/>
+
+#### ✅ 정상 파일
+<img src="screenshots/ok.png" width="600"/>
