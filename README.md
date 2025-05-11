@@ -44,6 +44,7 @@ git clone https://github.com/yourusername/exiftool-analyzer.git
 cd exiftool-analyzer
 pip install -r requirements.txt
 python main.py
+```
 
 ---
 
