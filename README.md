@@ -45,7 +45,7 @@ python fae.py
 ## 📂 프로젝트 구조
 ```bash
 FAE_fileAnalysisExiftool/
-├── main.py              # 메인 GUI 코드
+├── fae.py              # 메인 GUI 코드
 ├── README.md            # 문서 파일
 ├── requirements.txt     # 설치 패키지 목록
 └── test_samples/        # 위조 테스트 파일 모음 (선택사항)
