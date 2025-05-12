@@ -8,21 +8,21 @@
 
 | 기능 항목                 | 설명                                                                 |
 |--------------------------|----------------------------------------------------------------------|
-| 🔍 **Hex 헤더 분석**       | 파일 앞부분 64바이트를 추출하여 **16진수 + ASCII** 형태로 출력       |
-| 🎯 **Magic Number 포맷 식별** | 파일의 실제 포맷(PNG, JPG, EXE 등)을 **시그니처 기반으로 자동 감지** |
-| ⚠️ **확장자 vs 포맷 불일치 감지** | 확장자와 magic number 기반 포맷이 다르면 **경고 출력**                |
-| 📂 **메타데이터 분석 (ExifTool)** | 생성/수정 시간, MIME Type 등 파일 내부 메타정보 표시               |
-| 📌 **포맷 위조 의심 요약**     | 포맷 구조와 메타데이터의 불일치 여부를 **요약 정리**                  |
-| 🔗 **VirusTotal 연동**       | 버튼 클릭만으로 해당 파일의 **해시 기반 악성 여부 확인 가능**        |
+| **Hex 헤더 분석**       | 파일 앞부분 64바이트를 추출하여 **16진수 + ASCII** 형태로 출력       |
+| **Magic Number 포맷 식별** | 파일의 실제 포맷(PNG, JPG, EXE 등)을 **시그니처 기반으로 자동 감지** |
+| **확장자 vs 포맷 불일치 감지** | 확장자와 magic number 기반 포맷이 다르면 **경고 출력**                |
+| **메타데이터 분석 (ExifTool)** | 생성/수정 시간, MIME Type 등 파일 내부 메타정보 표시               |
+| **포맷 위조 의심 요약**     | 포맷 구조와 메타데이터의 불일치 여부를 **요약 정리**                  |
+| **VirusTotal 연동**       | 버튼 클릭만으로 해당 파일의 **해시 기반 악성 여부 확인 가능**        |
 
 
 ## 🧪 지원 포맷
 
-- 📷 이미지: `jpg`, `png`, `gif`  
-- 📄 문서: `pdf`, `hwp`, `doc`, `docx`, `txt`  
-- 📊 스프레드시트: `xls`, `xlsx`  
-- 📽️ 프레젠테이션: `ppt`, `pptx`  
-- ⚙️ 실행파일: `exe`  
+- 이미지: `jpg`, `png`, `gif`  
+- 문서: `pdf`, `hwp`, `doc`, `docx`, `txt`  
+- 스프레드시트: `xls`, `xlsx`  
+- 프레젠테이션: `ppt`, `pptx`  
+- 실행파일: `exe`  
 - 기타: ZIP 구조 기반 포맷 자동 감지 (`docx`, `pptx` 등)
 
 
@@ -37,10 +37,8 @@
 
 ### 2. 설치 및 실행
 ```bash
-git clone https://github.com/yourusername/exiftool-analyzer.git
-cd exiftool-analyzer
-pip install -r requirements.txt
-python main.py
+git clone https://github.com/songyaeji/FAE_fileAnalysisExiftool
+python fae.py
 ```
 
 
